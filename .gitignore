@@ -1,0 +1,6 @@
+# Project exclude paths
+/.gradle/
+/Desktop Calculator/task/build/
+/Desktop Calculator/task/out/
+/Desktop Calculator/task/out/production/classes/
+/Desktop Calculator/task/out/test/classes/
