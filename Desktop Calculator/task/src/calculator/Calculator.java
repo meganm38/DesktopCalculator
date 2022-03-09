@@ -33,7 +33,7 @@ public class Calculator extends JFrame {
     public String calculate(String equation) {
         try {
             checkValidEquation(equation);
-            String[] operands = equation.split("[+\\-*/]");
+            String[] operands = equation.split("[+\\-x/]");
             String operator = equation.substring(operands[0].length(), operands[0].length() + 1);
 
             int result;
@@ -44,7 +44,7 @@ public class Calculator extends JFrame {
                 case "-":
                     result = Integer.parseInt(operands[0]) - Integer.parseInt(operands[1]);
                     break;
-                case "*":
+                case "x":
                     result = Integer.parseInt(operands[0]) * Integer.parseInt(operands[1]);
                     break;
                 default:
@@ -59,14 +59,14 @@ public class Calculator extends JFrame {
 
     public void checkValidEquation(String equation) throws InvalidEquation {
         //only supports integer addition now
-        if (!equation.matches("(0|[1-9](\\d)*)([+\\-*/])(0|[1-9](\\d)*)")) {
+        if (!equation.matches("(0|[1-9](\\d)*)([+\\-x/])(0|[1-9](\\d)*)")) {
             throw new InvalidEquation();
         }
     }
 
     public void addButtonsToPanel() {
         JButton btn1 = new JButton("1");
-        btn1.setName("Zero");
+        btn1.setName("One");
         JButton btn2 = new JButton("2");
         btn2.setName("Two");
         JButton btn3 = new JButton("3");
@@ -109,7 +109,7 @@ public class Calculator extends JFrame {
         plus.addActionListener(e -> equationTextField.setText(equationTextField.getText() + "+"));
         minus.addActionListener(e -> equationTextField.setText(equationTextField.getText() + "-"));
         divide.addActionListener(e -> equationTextField.setText(equationTextField.getText() + "/"));
-        multiply.addActionListener(e -> equationTextField.setText(equationTextField.getText() + "*"));
+        multiply.addActionListener(e -> equationTextField.setText(equationTextField.getText() + "x"));
         equals.addActionListener(e -> {
             String equation = equationTextField.getText();
             equationTextField.setText(calculate(equation));
