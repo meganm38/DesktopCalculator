@@ -3,31 +3,51 @@ package calculator;
 import Exceptions.InvalidEquation;
 
 import javax.swing.*;
-import javax.swing.text.JTextComponent;
+import java.awt.*;
 
 public class Calculator extends JFrame {
+    private static final int GAP = 10;
     private JPanel controlPanel;
-    private JTextComponent equationTextField;
+    private JLabel resultLabel;
+    private JLabel equationLabel;
+    private JPanel displayPanel;
+    private JPanel mainPanel;
 
     public Calculator() {
         super("Calculator");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(300, 400);
-        setLocationRelativeTo(null);
+
+        JButton fake = new JButton("0");
+        Dimension dimension = fake.getPreferredSize();
+        setSize(dimension.width * 4 + GAP * 5, 480);
+
         initComponents();
-        //setLayout(null); // sets absolute positioning of components
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 
     public void initComponents() {
-        equationTextField = new JTextField(20);
-        equationTextField.setName("EquationTextField");
-        equationTextField.setEditable(false);
+        mainPanel = new JPanel(new GridLayout(2, 1));
+        displayPanel = new JPanel(new GridLayout(2, 1));
+        resultLabel = new JLabel("0", SwingConstants.RIGHT);
+        resultLabel.setName("ResultLabel");
+        resultLabel.setFont(new Font("Serif", Font.BOLD, 30));
+
+        equationLabel = new JLabel("", SwingConstants.RIGHT);
+        equationLabel.setName("EquationLabel");
+        equationLabel.setFont(new Font("Serif", Font.PLAIN, 15));
+        equationLabel.setForeground(Color.blue);
+
+        displayPanel.add(resultLabel);
+        displayPanel.add(equationLabel);
 
         controlPanel = new JPanel();
-        controlPanel.add(equationTextField);
+        controlPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, GAP, GAP));
+
         addButtonsToPanel();
-        add(controlPanel);
+        mainPanel.add(displayPanel);
+        mainPanel.add(controlPanel);
+        add(mainPanel);
     }
 
     public String calculate(String equation) {
@@ -51,7 +71,7 @@ public class Calculator extends JFrame {
                     result = Integer.parseInt(operands[0]) / Integer.parseInt(operands[1]);
                     break;
             }
-            return equation + "=" + result;
+            return result + "";
         } catch (InvalidEquation e) {
             return "Invalid input";
         }
@@ -59,7 +79,7 @@ public class Calculator extends JFrame {
 
     public void checkValidEquation(String equation) throws InvalidEquation {
         //only supports integer addition now
-        if (!equation.matches("(0|[1-9](\\d)*)([+\\-x/])(0|[1-9](\\d)*)")) {
+        if (!equation.matches("((0|[1-9](\\d)*)([+\\-x/])(0|[1-9](\\d)*))+")) {
             throw new InvalidEquation();
         }
     }
@@ -96,39 +116,63 @@ public class Calculator extends JFrame {
         JButton equals = new JButton("=");
         equals.setName("Equals");
 
-        btn0.addActionListener(e -> equationTextField.setText(equationTextField.getText() + "0"));
-        btn1.addActionListener(e -> equationTextField.setText(equationTextField.getText() + "1"));
-        btn2.addActionListener(e -> equationTextField.setText(equationTextField.getText() + "2"));
-        btn3.addActionListener(e -> equationTextField.setText(equationTextField.getText() + "3"));
-        btn4.addActionListener(e -> equationTextField.setText(equationTextField.getText() + "4"));
-        btn5.addActionListener(e -> equationTextField.setText(equationTextField.getText() + "5"));
-        btn6.addActionListener(e -> equationTextField.setText(equationTextField.getText() + "6"));
-        btn7.addActionListener(e -> equationTextField.setText(equationTextField.getText() + "7"));
-        btn8.addActionListener(e -> equationTextField.setText(equationTextField.getText() + "8"));
-        btn9.addActionListener(e -> equationTextField.setText(equationTextField.getText() + "9"));
-        plus.addActionListener(e -> equationTextField.setText(equationTextField.getText() + "+"));
-        minus.addActionListener(e -> equationTextField.setText(equationTextField.getText() + "-"));
-        divide.addActionListener(e -> equationTextField.setText(equationTextField.getText() + "/"));
-        multiply.addActionListener(e -> equationTextField.setText(equationTextField.getText() + "x"));
-        equals.addActionListener(e -> {
-            String equation = equationTextField.getText();
-            equationTextField.setText(calculate(equation));
-        });
+        JButton btnDecimal = new JButton(".");
+        btnDecimal.setName("Dot");
 
+        JButton btnClear = new JButton("C");
+        btnClear.setName("Clear");
+
+        JButton btnDelete = new JButton("Del");
+        btnDelete.setName("Delete");
+
+        btn0.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "0"));
+        btn1.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "1"));
+        btn2.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "2"));
+        btn3.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "3"));
+        btn4.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "4"));
+        btn5.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "5"));
+        btn6.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "6"));
+        btn7.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "7"));
+        btn8.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "8"));
+        btn9.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "9"));
+        plus.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "+"));
+        minus.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "-"));
+        divide.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "/"));
+        multiply.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "x"));
+        equals.addActionListener(e -> {
+            String equation = equationLabel.getText();
+            resultLabel.setText(calculate(equation));
+        });
+        btnClear.addActionListener(e -> equationLabel.setText(""));
+        btnDelete.addActionListener(e -> {
+            String equation = equationLabel.getText();
+            equationLabel.setText(equation.substring(0, equation.length() - 1));
+        });
+        btnDecimal.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "."));
+
+        JLabel fake = new JLabel();
+        fake.setPreferredSize(btn0.getPreferredSize());
+        JLabel fake1 = new JLabel();
+        fake1.setPreferredSize(btn0.getPreferredSize());
+        controlPanel.add(fake);
+        controlPanel.add(fake1);
+        controlPanel.add(btnClear);
+        controlPanel.add(btnDelete);
+        controlPanel.add(btn7);
+        controlPanel.add(btn8);
+        controlPanel.add(btn9);
+        controlPanel.add(divide);
+        controlPanel.add(btn4);
+        controlPanel.add(btn5);
+        controlPanel.add(btn6);
+        controlPanel.add(multiply);
         controlPanel.add(btn1);
         controlPanel.add(btn2);
         controlPanel.add(btn3);
         controlPanel.add(plus);
-        controlPanel.add(btn4);
-        controlPanel.add(btn5);
-        controlPanel.add(btn6);
-        controlPanel.add(minus);
-        controlPanel.add(btn7);
-        controlPanel.add(btn8);
-        controlPanel.add(btn9);
-        controlPanel.add(multiply);
+        controlPanel.add(btnDecimal);
         controlPanel.add(btn0);
         controlPanel.add(equals);
-        controlPanel.add(divide);
+        controlPanel.add(minus);
     }
 }
