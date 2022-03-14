@@ -14,7 +14,7 @@ public class CalculationPerformer {
         String postFix = toPostFix(equation);
         for (int i = 0; i < postFix.length(); i++) {
             if (postFix.charAt(i) == ' ') {
-                if (postFix.substring(startIndex, i).matches("(0|[1-9](\\d)*(.(\\d)+)?)")) {
+                if (postFix.substring(startIndex, i).matches("(0(.(\\d)+)?|[1-9](\\d)*(.(\\d)+)?)")) {
                     stack.push(postFix.substring(startIndex, i));
                 } else {
                     String operand1;
@@ -59,7 +59,11 @@ public class CalculationPerformer {
 
     public void checkValidEquation(String equation) throws InvalidEquation {
         //only supports integer addition now
-        if (!equation.matches("((0|[1-9](\\d)*(.(\\d)+)?)([+\\-\u00D7\u00F7])(0|[1-9](\\d)*(.(\\d)+)?))+(([+\\-\u00D7\u00F7])(0|[1-9](\\d)*(.(\\d)+)?))*")) {
+        if (!equation.matches("((0(.(\\d)+)?|[1-9](\\d)*(.(\\d)+)?)([+\\-\u00D7\u00F7])(0(.(\\d)+)?|[1-9](\\d)*(.(\\d)+)?))+(([+\\-\u00D7\u00F7])(0(.(\\d)+)?|[1-9](\\d)*(.(\\d)+)?))*")) {
+            throw new InvalidEquation();
+        }
+
+        if (equation.contains("\u00F70")) {
             throw new InvalidEquation();
         }
     }

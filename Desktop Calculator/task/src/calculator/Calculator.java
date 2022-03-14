@@ -34,13 +34,13 @@ public class Calculator extends JFrame {
         resultLabel = new JLabel("0", SwingConstants.RIGHT);
         resultLabel.setName("ResultLabel");
         resultLabel.setFont(new Font("Serif", Font.BOLD, 30));
-        resultLabel.setBorder(new EmptyBorder(10,20,10,20));
+        resultLabel.setBorder(new EmptyBorder(10, 20, 10, 20));
 
         equationLabel = new JLabel("", SwingConstants.RIGHT);
         equationLabel.setName("EquationLabel");
         equationLabel.setFont(new Font("Serif", Font.PLAIN, 15));
         equationLabel.setForeground(Color.green.darker());
-        equationLabel.setBorder(new EmptyBorder(10,20,10,20));
+        equationLabel.setBorder(new EmptyBorder(10, 20, 10, 20));
 
         displayPanel.add(resultLabel);
         displayPanel.add(equationLabel);
@@ -126,10 +126,12 @@ public class Calculator extends JFrame {
         btn7.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "7"));
         btn8.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "8"));
         btn9.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "9"));
-        plus.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "+"));
-        minus.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "-"));
-        divide.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "\u00F7"));
-        multiply.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "\u00D7"));
+
+        plus.addActionListener(e -> formatEquationLabel("+"));
+        minus.addActionListener(e -> formatEquationLabel("-"));
+        divide.addActionListener(e -> formatEquationLabel("\u00F7"));
+        multiply.addActionListener(e -> formatEquationLabel("\u00D7"));
+        
         equals.addActionListener(e -> {
             String equation = equationLabel.getText();
             try {
@@ -145,7 +147,18 @@ public class Calculator extends JFrame {
             String equation = equationLabel.getText();
             equationLabel.setText(equation.substring(0, equation.length() - 1));
         });
-        btnDecimal.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "."));
+        btnDecimal.addActionListener(e -> {
+            String lastInput = "";
+            if (equationLabel.getText().length() > 0) {
+                lastInput = equationLabel.getText().substring(equationLabel.getText().length() - 1);
+
+            }
+            if (lastInput.matches("\\d") || lastInput.equals("")) {
+                equationLabel.setText(equationLabel.getText() + ".");
+            } else {
+                equationLabel.setText(equationLabel.getText() + "0.");
+            }
+        });
 
 
         controlPanel.add(btnParentheses);
@@ -177,5 +190,30 @@ public class Calculator extends JFrame {
         controlPanel.add(btn0);
         controlPanel.add(btnDecimal);
         controlPanel.add(equals);
+    }
+
+    private void formatEquationLabel(String operator) {
+        String equation = equationLabel.getText();
+        if (!equation.isEmpty()) {
+            String lastInput = equation.substring(equation.length() - 1);
+            if (lastInput.matches("([+\\-\u00D7\u00F7])")) {
+                equation = equation.substring(0, equation.length() - 1) + operator;
+            } else {
+                equation = equation + operator;
+            }
+
+            int dotLastIndex = equation.lastIndexOf(".");
+            if (dotLastIndex == 0 ||
+                    (dotLastIndex != -1 &&
+                            !equation.substring(dotLastIndex - 1, dotLastIndex).matches("\\d"))) {
+                equation = equation.substring(0, dotLastIndex) + "0" + equation.substring(dotLastIndex);
+            }
+            dotLastIndex = equation.lastIndexOf(".");
+            if (dotLastIndex != -1 &&
+                    !equation.substring(dotLastIndex + 1, dotLastIndex + 2).matches("\\d")) {
+                equation = equation.substring(0, dotLastIndex + 1) + "0" + equation.substring(dotLastIndex + 1);
+            }
+            equationLabel.setText(equation);
+        }
     }
 }
