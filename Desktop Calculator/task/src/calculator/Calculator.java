@@ -12,9 +12,7 @@ public class Calculator extends JFrame {
     private JPanel controlPanel;
     private JLabel resultLabel;
     private JLabel equationLabel;
-    private JPanel displayPanel;
-    private JPanel mainPanel;
-    private CalculationPerformer calculationPerformer;
+    private final CalculationPerformer calculationPerformer;
 
     public Calculator() {
         super("Calculator");
@@ -31,8 +29,8 @@ public class Calculator extends JFrame {
     }
 
     public void initComponents() {
-        mainPanel = new JPanel(new GridLayout(2, 1));
-        displayPanel = new JPanel(new GridLayout(2, 1));
+        JPanel mainPanel = new JPanel(new GridLayout(2, 1));
+        JPanel displayPanel = new JPanel(new GridLayout(2, 1));
         resultLabel = new JLabel("0", SwingConstants.RIGHT);
         resultLabel.setName("ResultLabel");
         resultLabel.setFont(new Font("Serif", Font.BOLD, 30));
@@ -56,7 +54,6 @@ public class Calculator extends JFrame {
         mainPanel.add(controlPanel);
         add(mainPanel);
     }
-
 
 
     public void addButtonsToPanel() {
@@ -83,17 +80,14 @@ public class Calculator extends JFrame {
 
         JButton equals = new JButton("=");
         equals.setName("Equals");
-//        equals.setBackground(Color.cyan);
-//        equals.setOpaque(true);
-//        equals.setBorderPainted(false);
 
-        JButton plus = new JButton("+");
+        JButton plus = new JButton("\u002B");
         plus.setName("Add");
-        JButton minus = new JButton("-");
+        JButton minus = new JButton("\u2212");
         minus.setName("Subtract");
-        JButton multiply = new JButton("x");
+        JButton multiply = new JButton("\u00D7");
         multiply.setName("Multiply");
-        JButton divide = new JButton("/");
+        JButton divide = new JButton("\u00F7");
         divide.setName("Divide");
 
         JButton btnDecimal = new JButton(".");
@@ -134,8 +128,8 @@ public class Calculator extends JFrame {
         btn9.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "9"));
         plus.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "+"));
         minus.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "-"));
-        divide.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "/"));
-        multiply.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "x"));
+        divide.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "\u00F7"));
+        multiply.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "\u00D7"));
         equals.addActionListener(e -> {
             String equation = equationLabel.getText();
             try {
@@ -163,7 +157,6 @@ public class Calculator extends JFrame {
         controlPanel.add(btnPowerY);
         controlPanel.add(btnSquareRoot);
         controlPanel.add(divide);
-
 
         controlPanel.add(btn7);
         controlPanel.add(btn8);
