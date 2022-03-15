@@ -131,7 +131,29 @@ public class Calculator extends JFrame {
         minus.addActionListener(e -> formatEquationLabel("-"));
         divide.addActionListener(e -> formatEquationLabel("\u00F7"));
         multiply.addActionListener(e -> formatEquationLabel("\u00D7"));
-        
+        btnSquareRoot.addActionListener(e -> equationLabel.setText(equationLabel.getText() + "\u221A("));
+        btnPowerTwo.addActionListener(e -> {
+            if (!equationLabel.getText().isEmpty()){
+                equationLabel.setText(equationLabel.getText() + "^(2)");
+            }
+        });
+        btnPowerY.addActionListener(e -> {
+            if (!equationLabel.getText().isEmpty()) {
+                equationLabel.setText(equationLabel.getText() + "^(");
+            }
+        });
+        btnPlusMinus.addActionListener(e -> {
+            String equation = equationLabel.getText();
+
+
+            if (equation.startsWith("(-")) {
+                equationLabel.setText(equation.substring(2));
+            } else {
+                equationLabel.setText("(-" + equationLabel.getText());
+
+            }
+        });
+
         equals.addActionListener(e -> {
             String equation = equationLabel.getText();
             try {
@@ -142,11 +164,14 @@ public class Calculator extends JFrame {
                 equationLabel.setForeground(Color.RED.darker());
             }
         });
+
         btnClear.addActionListener(e -> equationLabel.setText(""));
+
         btnDelete.addActionListener(e -> {
             String equation = equationLabel.getText();
             equationLabel.setText(equation.substring(0, equation.length() - 1));
         });
+
         btnDecimal.addActionListener(e -> {
             String lastInput = "";
             if (equationLabel.getText().length() > 0) {
@@ -160,6 +185,27 @@ public class Calculator extends JFrame {
             }
         });
 
+        btnParentheses.addActionListener(e -> {
+            String equation = equationLabel.getText();
+            int numLeft = 0;
+            int numRight = 0;
+            for (int i = 0; i < equation.length(); i++) {
+                if (equation.charAt(i) == '(') {
+                    numLeft++;
+                }
+                if (equation.charAt(i) == ')') {
+                    numRight++;
+                }
+            }
+
+            if (numLeft == numRight) {
+                equationLabel.setText(equationLabel.getText() + "(");
+            } else if (equation.substring(equation.length() - 1).matches("[+\\-\u00D7\u00F7(^]")) {
+                equationLabel.setText(equationLabel.getText() + "(");
+            } else {
+                equationLabel.setText(equationLabel.getText() + ")");
+            }
+        });
 
         controlPanel.add(btnParentheses);
         controlPanel.add(btnCE);
@@ -194,14 +240,17 @@ public class Calculator extends JFrame {
 
     private void formatEquationLabel(String operator) {
         String equation = equationLabel.getText();
+
         if (!equation.isEmpty()) {
-            String lastInput = equation.substring(equation.length() - 1);
-            if (lastInput.matches("([+\\-\u00D7\u00F7])")) {
+            //replace the first operator with the second one if two operators are entered consecutively
+            String lastChar = equation.substring(equation.length() - 1);
+            if (lastChar.matches("([+\\-\u00D7\u00F7])")) {
                 equation = equation.substring(0, equation.length() - 1) + operator;
             } else {
                 equation = equation + operator;
             }
 
+            //introduce leading or trailing zero if dot is entered without the integer part or decimal part
             int dotLastIndex = equation.lastIndexOf(".");
             if (dotLastIndex == 0 ||
                     (dotLastIndex != -1 &&

@@ -5,6 +5,7 @@ import Exceptions.InvalidEquation;
 import java.util.Stack;
 
 public class CalculationPerformer {
+    final private static String OPERATOR_REGEX = "([+\\-\u00D7\u00F7])";
 
     public String calculate(String equation) {
         Stack<String> stack = new Stack<>();
@@ -16,19 +17,27 @@ public class CalculationPerformer {
             if (postFix.charAt(i) == ' ') {
                 if (postFix.substring(startIndex, i).matches("(0(.(\\d)+)?|[1-9](\\d)*(.(\\d)+)?)")) {
                     stack.push(postFix.substring(startIndex, i));
+                } else if (postFix.substring(startIndex, i).matches("\u221A")) {
+                    String operand = stack.pop();
+                    result = Math.sqrt(Double.parseDouble(operand));
+                    stack.push(result + "");
+                    result = 0.0;
                 } else {
-                    String operand1;
-                    String operand2;
-
-                    operand1 = stack.pop();
-                    operand2 = stack.pop();
-
+                    String operand1 = stack.pop();
+                    String operand2 = null;
+                    if (!stack.isEmpty()) {
+                        operand2 = stack.pop();
+                    }
                     switch (postFix.substring(startIndex, i)) {
                         case "+":
                             result = Double.parseDouble(operand2) + Double.parseDouble(operand1);
                             break;
                         case "-":
-                            result = Double.parseDouble(operand2) - Double.parseDouble(operand1);
+                            if (operand2 != null) {
+                                result = Double.parseDouble(operand2) - Double.parseDouble(operand1);
+                            } else {
+                                result = 0 - Double.parseDouble(operand1);
+                            }
                             break;
                         case "\u00D7":
                             result = Double.parseDouble(operand2) * Double.parseDouble(operand1);
@@ -58,12 +67,34 @@ public class CalculationPerformer {
     }
 
     public void checkValidEquation(String equation) throws InvalidEquation {
-        //only supports integer addition now
-        if (!equation.matches("((0(.(\\d)+)?|[1-9](\\d)*(.(\\d)+)?)([+\\-\u00D7\u00F7])(0(.(\\d)+)?|[1-9](\\d)*(.(\\d)+)?))+(([+\\-\u00D7\u00F7])(0(.(\\d)+)?|[1-9](\\d)*(.(\\d)+)?))*")) {
+        if (equation.substring(equation.length() - 1).matches(OPERATOR_REGEX)){
             throw new InvalidEquation();
         }
-
         if (equation.contains("\u00F70")) {
+            throw new InvalidEquation();
+        }
+        String postFix = toPostFix(equation);
+        if (postFix.contains("\u221A")) {
+            for (int i = 0; i < toPostFix(equation).length(); i++) {
+                if (postFix.charAt(i) == '\u221A') {
+                    if (postFix.charAt(i - 2) == '-') {
+                        throw new InvalidEquation();
+                    }
+                }
+            }
+        }
+
+        int numLeft = 0;
+        int numRight = 0;
+        for (int i = 0; i < equation.length(); i++) {
+            if (equation.charAt(i) == '(') {
+                numLeft++;
+            }
+            if (equation.charAt(i) == ')') {
+                numRight++;
+            }
+        }
+        if (numLeft != numRight) {
             throw new InvalidEquation();
         }
     }
@@ -75,8 +106,10 @@ public class CalculationPerformer {
         stack.push("#");
 
         for (int i = 0; i < equation.length(); i++) {
-            if (equation.substring(i, i + 1).matches("[+\\-\u00D7\u00F7()^]")) {
-                stringBuilder.append(equation, startIndex, i).append(" ");
+            if (equation.substring(i, i + 1).matches("[+\\-\u00D7\u00F7()^\u221A]")) {
+                if (startIndex != i) {
+                    stringBuilder.append(equation, startIndex, i).append(" ");
+                }
                 startIndex = i + 1;
 
                 if (equation.charAt(i) == '(') {
@@ -99,7 +132,8 @@ public class CalculationPerformer {
                 }
             }
             if (i == equation.length() - 1) {
-                stringBuilder.append(equation, startIndex, i + 1).append(" ");
+                if (equation.substring(startIndex, i + 1).matches("(0(.(\\d)+)?|[1-9](\\d)*(.(\\d)+)?)"))
+                    stringBuilder.append(equation, startIndex, i + 1).append(" ");
             }
         }
         while (!stack.peek().equals("#")) {
@@ -118,6 +152,8 @@ public class CalculationPerformer {
                 return 2;
             case "^":
                 return 3;
+            case "\u221A":
+                return 4;
             default:
                 return 0;
         }
